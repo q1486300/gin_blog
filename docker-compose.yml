@@ -1,0 +1,37 @@
+version: "3.8"
+
+services:
+  ginblog_backend:
+    image: gin_blog:latest
+    container_name: gin_blog
+    ports:
+      - "3000:3000"
+    volumes:
+      - /app/gin_blog/logs:/app/logs
+      - /app/gin_blog/uploads:/app/uploads
+    networks:
+      - ginblog_net
+    depends_on:
+      - mysql
+    restart: on-failure
+
+  mysql:
+    image: mysql:latest
+    container_name: ginblog_mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: 'admin123456'
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'no'
+      MYSQL_DATABASE: 'ginblog'
+      MYSQL_USER: 'ginblog'
+      MYSQL_PASSWORD: 'admin123456'
+    ports:
+      - "3306:3306"
+    volumes:
+      - /app/mysql/data:/var/lib/mysql
+      - /app/mysql/init:/docker-entrypoint-initdb.d
+    networks:
+      - ginblog_net
+    command: --default-authentication-plugin=mysql_native_password
+
+networks:
+  ginblog_net:
